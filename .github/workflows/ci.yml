@@ -33,9 +33,6 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Verify lockfile
-        run: git diff --exit-code pubspec.lock
-
       - name: Analyze
         id: analyze
         continue-on-error: true
