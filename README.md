@@ -1,6 +1,6 @@
-# StrobeSystem Controller
+# LumaHub
 
-A Flutter mobile application and ESP32 firmware for configuring and controlling an eight-channel strobe-light controller over Bluetooth Low Energy (BLE).
+LumaHub is a Flutter mobile application and ESP32 firmware for configuring and controlling an eight-channel lighting system over Bluetooth Low Energy (BLE).
 
 > **Project status:** MVP / prototype. The repository includes the mobile client, ESP32 firmware, tests, hardware setup documentation, and an automated Android release workflow.
 
@@ -8,8 +8,8 @@ A Flutter mobile application and ESP32 firmware for configuring and controlling 
 
 The system consists of two parts:
 
-1. **Flutter client** — discovers and connects to the controller, sends control commands, manages device profiles, and displays connection state.
-2. **ESP32 firmware** — exposes a custom BLE GATT service, parses commands, drives up to eight configured output channels, stores runtime configuration in NVS, and switches outputs off when communication is lost.
+1. **LumaHub mobile client** — discovers and connects to the controller, sends control commands, manages device profiles, and displays connection state.
+2. **LumaHub ESP32 controller** — exposes a custom BLE GATT service, parses commands, drives up to eight configured output channels, stores runtime configuration in NVS, and switches outputs off when communication is lost.
 
 The application also includes a mock transport, so most UI flows can be demonstrated without physical hardware.
 
@@ -41,7 +41,7 @@ The application also includes a mock transport, so most UI flows can be demonstr
 ## Architecture
 
 ```text
-Flutter UI
+LumaHub Flutter UI
    │
    ▼
 App state / providers
@@ -55,7 +55,7 @@ ControllerConnectionService
 ControllerCommandCodec
    │  BLE GATT
    ▼
-ESP32 BLEHandler
+LumaHub ESP32 BLEHandler
    ▼
 CommandParser ── ConfigStore / SafetyManager
    ▼
@@ -87,7 +87,7 @@ firmware/esp32_ble_controller/
 
 | Item | Value |
 |---|---|
-| Advertised device name | `ESP32-StrobeCtrl` |
+| Advertised device name | `LumaHub-ESP32` |
 | Service UUID | `5E7A1001-0000-4C0A-B001-112233445566` |
 | Command characteristic | `5E7A1002-0000-4C0A-B001-112233445566` |
 | Status characteristic | `5E7A1003-0000-4C0A-B001-112233445566` |
@@ -177,9 +177,9 @@ Known gaps include hardware-in-the-loop testing, automated firmware unit tests, 
 
 The GitHub Actions workflow runs static analysis and Flutter tests, builds a release APK, and publishes:
 
-- `StagePatch-release.apk`
-- `ESP32_firmware_only.zip`
-- `StagePatch_sources.zip`
+- `LumaHub-android.apk`
+- `LumaHub-ESP32-firmware.zip`
+- `LumaHub-sources.zip`
 
 A release is created when a `v*` tag is pushed or when the workflow is started manually.
 

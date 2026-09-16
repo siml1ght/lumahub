@@ -20,7 +20,7 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider<AppState>.value(
         value: appState,
-        child: const StrobeControllerApp(),
+        child: const LumaHubApp(),
       ),
     );
     await tester.pumpAndSettle();

@@ -9,7 +9,7 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider(
         create: (_) => AppState(),
-        child: const StrobeControllerApp(),
+        child: const LumaHubApp(),
       ),
     );
 

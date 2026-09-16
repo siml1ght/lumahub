@@ -24,7 +24,7 @@ class ConnectionScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'Controller Connection',
+          'LumaHub Connection',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 16),
@@ -91,7 +91,7 @@ class ConnectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Expected device: ESP32-StrobeCtrl. If Android shows it in Bluetooth settings, do not pair there: connect from this screen.',
+                'Expected device: LumaHub-ESP32. If Android shows it in Bluetooth settings, do not pair there: connect from this screen.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 12),
