@@ -32,12 +32,11 @@ class BleConnectionService implements ControllerConnectionService {
   StreamSubscription<BluetoothConnectionState>? _connectionSubscription;
   final Map<String, BluetoothDevice> _scanCache = <String, BluetoothDevice>{};
   static const List<String> _controllerNameHints = <String>[
-    'esp32-strobectrl',
-    'esp32 strobectrl',
-    'esp32 strobe controller',
+    'lumahub-esp32',
+    'lumahub esp32',
+    'lumahub',
     'esp32',
-    'strobe controller',
-    'strobe',
+    'lighting controller',
   ];
 
   @override
@@ -72,7 +71,7 @@ class BleConnectionService implements ControllerConnectionService {
 
         final displayName = name.trim().isNotEmpty ? name.trim() : 'BLE Controller';
         final tag = advertisesTargetService || looksLikeController
-            ? 'ESP32 candidate'
+            ? 'LumaHub candidate'
             : 'BLE device';
         final displayKey = '$displayName  (${result.device.remoteId.str})  - $tag';
         _scanCache[displayKey] = result.device;
