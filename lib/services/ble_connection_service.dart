@@ -27,7 +27,6 @@ class BleConnectionService implements ControllerConnectionService {
 
   BluetoothDevice? _device;
   BluetoothCharacteristic? _commandCharacteristic;
-  BluetoothCharacteristic? _statusCharacteristic;
   StreamSubscription<List<ScanResult>>? _scanSubscription;
   StreamSubscription<List<int>>? _notificationSubscription;
   StreamSubscription<BluetoothConnectionState>? _connectionSubscription;
@@ -118,7 +117,6 @@ class BleConnectionService implements ControllerConnectionService {
       _connectionSubscription = device.connectionState.listen((state) {
         if (state == BluetoothConnectionState.disconnected) {
           _commandCharacteristic = null;
-          _statusCharacteristic = null;
           _incomingController.add('DISCONNECTED');
         }
       });
@@ -157,7 +155,6 @@ class BleConnectionService implements ControllerConnectionService {
       }
 
       _commandCharacteristic = foundCommandCharacteristic;
-      _statusCharacteristic = foundStatusCharacteristic;
       await foundStatusCharacteristic.setNotifyValue(true);
       _notificationSubscription = foundStatusCharacteristic.lastValueStream.listen(
         (value) {
@@ -240,7 +237,6 @@ class BleConnectionService implements ControllerConnectionService {
     await _connectionSubscription?.cancel();
     _connectionSubscription = null;
     _commandCharacteristic = null;
-    _statusCharacteristic = null;
 
     final device = _device;
     _device = null;
