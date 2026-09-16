@@ -5,15 +5,15 @@ import '../providers/app_state.dart';
 import '../screens/home_shell.dart';
 import 'theme/app_theme.dart';
 
-class StrobeControllerApp extends StatelessWidget {
-  const StrobeControllerApp({super.key});
+class LumaHubApp extends StatelessWidget {
+  const LumaHubApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
 
     return MaterialApp(
-      title: 'Strobe Controller',
+      title: 'LumaHub',
       debugShowCheckedModeBanner: false,
       themeMode: appState.themeMode,
       theme: AppTheme.light(),

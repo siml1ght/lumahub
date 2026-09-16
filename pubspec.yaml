@@ -1,5 +1,5 @@
 name: strobe_controller_mobile
-description: Offline-first Flutter app for configuring and controlling Arduino or ESP32 strobe systems.
+description: LumaHub mobile application for configuring and controlling an ESP32 lighting system over BLE.
 publish_to: "none"
 version: 0.1.0+1
 

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 namespace Config {
-constexpr char kDeviceName[] = "ESP32-StrobeCtrl";
+constexpr char kDeviceName[] = "LumaHub-ESP32";
 constexpr char kServiceUuid[] = "5E7A1001-0000-4C0A-B001-112233445566";
 constexpr char kCommandCharacteristicUuid[] =
     "5E7A1002-0000-4C0A-B001-112233445566";

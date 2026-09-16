@@ -1,4 +1,6 @@
-# ESP32 BLE Strobe Controller Firmware
+# LumaHub ESP32 BLE Firmware
+
+Firmware for the ESP32 controller used by LumaHub.
 
 ## Libraries
 - ESP32 Arduino core
@@ -14,7 +16,7 @@
 - Status: `5E7A1003-0000-4C0A-B001-112233445566`
 
 ## BLE Name
-- `ESP32-StrobeCtrl`
+- `LumaHub-ESP32`
 
 ## Commands
 - `HELLO`

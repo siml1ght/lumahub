@@ -9,7 +9,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (_) => AppState()..bootstrap(),
-      child: const StrobeControllerApp(),
+      child: const LumaHubApp(),
     ),
   );
 }

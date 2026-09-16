@@ -1,4 +1,4 @@
-name: Build APK and publish release
+name: Build LumaHub APK and publish release
 
 on:
   push:
@@ -19,7 +19,7 @@ env:
 
 jobs:
   android-release:
-    name: Android APK release
+    name: LumaHub Android APK release
     runs-on: ubuntu-latest
 
     steps:
@@ -71,9 +71,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p release
-          cp build/app/outputs/flutter-apk/app-release.apk release/StagePatch-release.apk
-          zip -r release/ESP32_firmware_only.zip firmware/esp32_ble_controller
-          zip -r release/StagePatch_sources.zip \
+          cp build/app/outputs/flutter-apk/app-release.apk release/LumaHub-android.apk
+          zip -r release/LumaHub-ESP32-firmware.zip firmware/esp32_ble_controller
+          zip -r release/LumaHub-sources.zip \
             AGENTS.md README.md CHANGELOG.md pubspec.yaml pubspec.lock \
             lib assets android ios test integration_test docs examples firmware \
             -x "android/.gradle/*" "android/app/build/*"
@@ -91,6 +91,6 @@ jobs:
           else
             gh release create "$TAG_NAME" release/* \
               --target "$GITHUB_SHA" \
-              --title "StagePatch ${VERSION}" \
-              --notes "Android APK, ESP32 firmware, and source package for StagePatch."
+              --title "LumaHub ${VERSION}" \
+              --notes "LumaHub Android APK, ESP32 firmware, and source package."
           fi
