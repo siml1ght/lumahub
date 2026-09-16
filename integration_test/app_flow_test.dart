@@ -25,7 +25,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Controller Connection'), findsOneWidget);
+    expect(find.text('LumaHub Connection'), findsOneWidget);
 
     await tester.tap(find.text('Scan Controllers'));
     await tester.pumpAndSettle();
