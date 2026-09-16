@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag, for example v0.1.1. Leave empty to auto-generate."
+        description: "Release tag, for example v0.1.1. Use v0.1.0 to refresh the existing release."
         required: false
         type: string
 
@@ -78,7 +78,40 @@ jobs:
             lib assets android ios test integration_test docs examples firmware \
             -x "android/.gradle/*" "android/app/build/*"
 
-      - name: Publish GitHub release
+          cat > release-notes.md <<'EOF'
+          # LumaHub
+
+          LumaHub is an MVP for configuring and controlling an eight-channel ESP32 lighting controller over Bluetooth Low Energy.
+
+          ## Included
+
+          - Android application built with Flutter.
+          - ESP32 BLE firmware.
+          - Eight configurable output channels.
+          - Manual channel and group control.
+          - Strobe, alternate, and sequence patterns.
+          - Local profiles with JSON import and export.
+          - GPIO, output inversion, and fail-safe configuration.
+          - Heartbeat-based fail-safe shutdown.
+          - Diagnostic and GPIO test tools.
+          - Complete source package and hardware documentation.
+
+          ## Downloads
+
+          - `LumaHub-android.apk` — Android application.
+          - `LumaHub-ESP32-firmware.zip` — ESP32 firmware.
+          - `LumaHub-sources.zip` — application, firmware, tests, documentation, and examples.
+
+          ## Installation
+
+          BLE discovery and connection are performed inside LumaHub. Do not pair the ESP32 through the Android system Bluetooth screen.
+
+          ## Hardware safety
+
+          ESP32 GPIO pins must only drive logic-level inputs of a suitable MOSFET, transistor, relay-driver, or optocoupler stage. Do not connect automotive or other power loads directly to ESP32 GPIO. Validate the system with LEDs or a multimeter before connecting production hardware.
+          EOF
+
+      - name: Publish or update GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ steps.meta.outputs.tag }}
@@ -88,9 +121,16 @@ jobs:
           set -euo pipefail
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             gh release upload "$TAG_NAME" release/* --clobber
+            gh release edit "$TAG_NAME" \
+              --title "LumaHub ${VERSION} — ESP32 BLE MVP" \
+              --notes-file release-notes.md
+
+            gh release delete-asset "$TAG_NAME" StagePatch-release.apk --yes || true
+            gh release delete-asset "$TAG_NAME" ESP32_firmware_only.zip --yes || true
+            gh release delete-asset "$TAG_NAME" StagePatch_sources.zip --yes || true
           else
             gh release create "$TAG_NAME" release/* \
               --target "$GITHUB_SHA" \
-              --title "LumaHub ${VERSION}" \
-              --notes "LumaHub Android APK, ESP32 firmware, and source package."
+              --title "LumaHub ${VERSION} — ESP32 BLE MVP" \
+              --notes-file release-notes.md
           fi
