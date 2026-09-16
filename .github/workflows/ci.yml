@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -36,7 +37,32 @@ jobs:
         run: git diff --exit-code pubspec.lock
 
       - name: Analyze
-        run: flutter analyze
+        id: analyze
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter analyze 2>&1 | tee analyze.log
+
+      - name: Report analyzer diagnostics
+        if: steps.analyze.outcome == 'failure' && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          {
+            echo '### Flutter analyzer diagnostics'
+            echo
+            echo '```text'
+            cat analyze.log
+            echo '```'
+          } > analyze-comment.md
+          gh pr comment "$PR_NUMBER" --body-file analyze-comment.md
+
+      - name: Enforce analyzer result
+        if: steps.analyze.outcome == 'failure'
+        run: exit 1
 
   test:
     name: Unit and widget tests
