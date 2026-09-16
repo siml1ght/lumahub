@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../app/app_config.dart';
 import '../models/connection_state_model.dart';
 import 'controller_connection_service.dart';
 
@@ -15,7 +16,7 @@ class MockConnectionService implements ControllerConnectionService {
   @override
   Future<List<String>> scan() async {
     await Future<void>.delayed(const Duration(milliseconds: 600));
-    return const ['ESP32 Strobe Controller', 'Workshop Controller'];
+    return const [AppConfig.bleDeviceName];
   }
 
   @override
@@ -36,7 +37,7 @@ class MockConnectionService implements ControllerConnectionService {
   Future<ConnectionStateModel> disconnect() async {
     _connected = false;
     _streamController.add('DISCONNECTED');
-    return ConnectionStateModel.initial;
+    return ConnectionStateModel.initial.copyWith(mockMode: true);
   }
 
   @override

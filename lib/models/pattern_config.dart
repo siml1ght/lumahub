@@ -51,5 +51,35 @@ class PatternConfig {
     };
   }
 
+  factory PatternConfig.fromMap(Map<String, dynamic> map) {
+    final id = map['id'];
+    final name = map['name'];
+    if (id is! String || id.trim().isEmpty) {
+      throw const FormatException('Pattern id must be a non-empty string');
+    }
+    if (name is! String || name.trim().isEmpty) {
+      throw const FormatException('Pattern name must be a non-empty string');
+    }
+
+    final speed = (map['speed'] as num?)?.toDouble() ?? 1;
+    final pauseMs = (map['pauseMs'] as num?)?.toInt() ?? 100;
+    if (!speed.isFinite || speed < 0.1 || speed > 10) {
+      throw const FormatException('Pattern speed must be between 0.1 and 10');
+    }
+    if (pauseMs < 20 || pauseMs > 60000) {
+      throw const FormatException('Pattern pause must be between 20 and 60000 ms');
+    }
+
+    return PatternConfig(
+      id: id.trim(),
+      name: name.trim(),
+      speed: speed,
+      pauseMs: pauseMs,
+      syncEnabled: map['syncEnabled'] as bool? ?? true,
+      alternating: map['alternating'] as bool? ?? false,
+      randomMode: map['randomMode'] as bool? ?? false,
+    );
+  }
+
   String toJson() => jsonEncode(toMap());
 }

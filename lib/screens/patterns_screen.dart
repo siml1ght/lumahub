@@ -46,6 +46,7 @@ class PatternsScreen extends StatelessWidget {
                     value: pattern.speed,
                     min: 0.2,
                     max: 2.0,
+                    divisions: 18,
                     onChanged: (value) => state.updatePattern(
                       pattern.copyWith(speed: value),
                     ),
@@ -53,32 +54,37 @@ class PatternsScreen extends StatelessWidget {
                   _PatternSlider(
                     label: 'Pause ${pattern.pauseMs} ms',
                     value: pattern.pauseMs.toDouble(),
-                    min: 0,
+                    min: 20,
                     max: 500,
+                    divisions: 48,
                     onChanged: (value) => state.updatePattern(
                       pattern.copyWith(pauseMs: value.round()),
                     ),
                   ),
                   Wrap(
                     spacing: 8,
+                    runSpacing: 8,
                     children: [
                       FilterChip(
                         label: const Text('Sync'),
                         selected: pattern.syncEnabled,
-                        onSelected: (value) =>
-                            state.updatePattern(pattern.copyWith(syncEnabled: value)),
+                        onSelected: (value) => state.updatePattern(
+                          pattern.copyWith(syncEnabled: value),
+                        ),
                       ),
                       FilterChip(
                         label: const Text('Alternating'),
                         selected: pattern.alternating,
-                        onSelected: (value) =>
-                            state.updatePattern(pattern.copyWith(alternating: value)),
+                        onSelected: (value) => state.updatePattern(
+                          pattern.copyWith(alternating: value),
+                        ),
                       ),
                       FilterChip(
                         label: const Text('Random'),
                         selected: pattern.randomMode,
-                        onSelected: (value) =>
-                            state.updatePattern(pattern.copyWith(randomMode: value)),
+                        onSelected: (value) => state.updatePattern(
+                          pattern.copyWith(randomMode: value),
+                        ),
                       ),
                     ],
                   ),
@@ -98,6 +104,7 @@ class _PatternSlider extends StatelessWidget {
     required this.value,
     required this.min,
     required this.max,
+    required this.divisions,
     required this.onChanged,
   });
 
@@ -105,6 +112,7 @@ class _PatternSlider extends StatelessWidget {
   final double value;
   final double min;
   final double max;
+  final int divisions;
   final ValueChanged<double> onChanged;
 
   @override
@@ -117,6 +125,8 @@ class _PatternSlider extends StatelessWidget {
           value: value.clamp(min, max),
           min: min,
           max: max,
+          divisions: divisions,
+          label: value.round().toString(),
           onChanged: onChanged,
         ),
       ],

@@ -27,7 +27,8 @@ void BLEHandler::begin() {
   advertising->setMinPreferred(0x06);
   advertising->setMaxPreferred(0x12);
   BLEDevice::startAdvertising();
-  Serial.println("BLE advertising started as ESP32-StrobeCtrl");
+  Serial.print("BLE advertising started as ");
+  Serial.println(Config::kDeviceName);
 }
 
 void BLEHandler::updateStatus(const String& statusText) {
@@ -52,7 +53,11 @@ void BLEHandler::ServerCallbacks::onDisconnect(BLEServer* server) {
 
 void BLEHandler::CommandCallbacks::onWrite(BLECharacteristic* characteristic) {
   const auto raw = characteristic->getValue();
-  if (raw.length() == 0) {
+  if (raw.empty()) {
+    return;
+  }
+  if (raw.length() > Config::kMaxCommandLength) {
+    _owner.updateStatus("ERROR:COMMAND_TOO_LONG");
     return;
   }
   _owner._listener.onBleCommand(String(raw.c_str()));

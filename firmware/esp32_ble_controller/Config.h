@@ -10,6 +10,7 @@ constexpr char kCommandCharacteristicUuid[] =
 constexpr char kStatusCharacteristicUuid[] =
     "5E7A1003-0000-4C0A-B001-112233445566";
 
+constexpr size_t kMaxCommandLength = 180;
 constexpr uint8_t kChannelCount = 8;
 constexpr unsigned long kDisconnectSafeTimeoutMs = 5000;
 constexpr unsigned long kMinDisconnectSafeTimeoutMs = 1000;
