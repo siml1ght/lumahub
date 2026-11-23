@@ -2,7 +2,7 @@
 
 LumaHub is a Flutter mobile application and ESP32 firmware for configuring and controlling an eight-channel lighting system over Bluetooth Low Energy (BLE).
 
-> **Project status:** MVP / prototype. The repository includes the mobile client, ESP32 firmware, tests, hardware setup documentation, and an automated Android release workflow.
+> **Project status:** MVP. The mobile client, ESP32 firmware, tests, hardware setup documentation, and an automated Android release workflow are included. BLE control has not been verified on physical hardware yet.
 
 ## Overview
 
@@ -19,7 +19,7 @@ The application also includes a mock transport, so most UI flows can be demonstr
 
 - Flutter UI for Android and iOS project targets.
 - BLE discovery and connection through `flutter_blue_plus`.
-- Runtime Bluetooth permission handling.
+- BLE permission handling by `flutter_blue_plus` during scan, with human-readable errors.
 - Live control of individual channels and channel groups.
 - Strobe, alternate, and sequence command generation.
 - Local profile persistence with `shared_preferences`.
@@ -147,13 +147,13 @@ Requirements:
 - A physical BLE-capable device for live controller testing
 
 ```bash
-git clone https://github.com/siml1ght/strobesystem-controller.git
-cd strobesystem-controller
+git clone https://github.com/siml1ght/lumahub.git
+cd lumahub
 flutter pub get
 flutter run
 ```
 
-On Android, grant the Bluetooth permissions requested by the application. Live BLE testing should be performed on a physical device; the mock service can be used when hardware is unavailable.
+Turn on Bluetooth before scanning. `flutter_blue_plus` requests the needed permissions during `startScan()`: on Android 12 and newer it asks for Nearby Devices, on Android 11 and older it also asks for Location. The app shows a message telling you what to enable if a permission or the adapter is unavailable. Use a physical device for live BLE testing; the mock transport works without hardware.
 
 ### ESP32 firmware
 
@@ -177,11 +177,11 @@ Known gaps include hardware-in-the-loop testing, automated firmware unit tests, 
 
 The GitHub Actions workflow runs static analysis and Flutter tests, builds a release APK, and publishes:
 
-- `LumaHub-android.apk`
-- `LumaHub-ESP32-firmware.zip`
-- `LumaHub-sources.zip`
+- `LumaHub-release.apk`
+- `ESP32_firmware_only.zip`
+- `LumaHub_sources.zip`
 
-A release is created when a `v*` tag is pushed or when the workflow is started manually.
+A release is created when a `v*` tag is pushed or when the workflow is started manually. The APK is signed with the Android debug key so it can be installed for testing; a production keystore is required before publishing.
 
 ## Hardware Safety
 
@@ -198,6 +198,16 @@ Hardware documentation:
 - [`docs/BUILD_AND_WIRING_GUIDE_RU.md`](docs/BUILD_AND_WIRING_GUIDE_RU.md)
 - [`docs/LED_BENCH_TEST_GUIDE_RU.md`](docs/LED_BENCH_TEST_GUIDE_RU.md)
 - [`examples/led_bench_profile.json`](examples/led_bench_profile.json)
+
+## Troubleshooting
+
+**"Включите Bluetooth на телефоне и попробуйте снова"** — Bluetooth is off. Turn it on and tap Scan controllers again.
+
+**"Нет разрешения Bluetooth"** — the Nearby Devices permission was denied. Tap Open app settings and allow it.
+
+**No controllers discovered** — confirm the ESP32 is powered, flashed with this firmware, and advertising as `LumaHub-ESP32`. If Android shows the device in its Bluetooth settings, do not pair there; connect from the LumaHub app. Gateways, headphones, and lamps will also appear in the list; pick the controller by its name.
+
+**The app shows an old error message** — check Settings: the current build is labeled `LumaHub 0.2.0+4 / Build 4`. Uninstall an older build before installing a new APK if the version code has not changed.
 
 ## Technology Stack
 
@@ -220,4 +230,4 @@ Hardware documentation:
 
 ## License
 
-No license file is currently included. Unless a license is added, the source code remains under the repository owner's default copyright.
+MIT. See [LICENSE](LICENSE).
