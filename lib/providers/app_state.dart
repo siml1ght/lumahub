@@ -10,7 +10,6 @@ import '../models/light_device.dart';
 import '../models/light_group.dart';
 import '../models/pattern_config.dart';
 import '../services/ble_connection_service.dart';
-import '../services/ble_permission_service.dart';
 import '../services/command_codec.dart';
 import '../services/controller_connection_service.dart';
 import '../services/mock_connection_service.dart';
@@ -24,12 +23,10 @@ class AppState extends ChangeNotifier {
     ProfileStorageService? profileStorageService,
     ControllerCommandCodec? commandCodec,
     ProfileExchangeService? profileExchangeService,
-    BlePermissionService? blePermissionService,
     bool enableHeartbeat = true,
   })  : _profileStorageService = profileStorageService ?? ProfileStorageService(),
         _commandCodec = commandCodec ?? ControllerCommandCodec(),
         _profileExchangeService = profileExchangeService ?? ProfileExchangeService(),
-        _blePermissionService = blePermissionService ?? BlePermissionService(),
         _enableHeartbeat = enableHeartbeat {
     final mobilePlatform = !kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.android ||
@@ -43,7 +40,6 @@ class AppState extends ChangeNotifier {
   final ProfileStorageService _profileStorageService;
   final ControllerCommandCodec _commandCodec;
   final ProfileExchangeService _profileExchangeService;
-  final BlePermissionService _blePermissionService;
   final bool _enableHeartbeat;
   final Uuid _uuid = const Uuid();
 
@@ -140,9 +136,8 @@ class AppState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      if (!useMockMode) {
-        await _blePermissionService.ensurePermissions();
-      }
+      // flutter_blue_plus requests the correct BLE permissions itself inside
+      // startScan(), for every Android version. No pre-flight request here.
       discoveredControllers = await _connectionService.scan();
       connection = connection.copyWith(
         status: ControllerConnectionStatus.disconnected,
@@ -151,7 +146,7 @@ class AppState extends ChangeNotifier {
     } catch (error) {
       connection = connection.copyWith(
         status: ControllerConnectionStatus.error,
-        message: 'Scan failed: $error',
+        message: _friendlyBleError(error),
       );
       _log('ERROR:$error');
     } finally {
@@ -169,9 +164,6 @@ class AppState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      if (!useMockMode) {
-        await _blePermissionService.ensurePermissions();
-      }
       connection = await _connectionService.connect(controllerName);
       await sendRawCommand(_commandCodec.hello(), critical: true);
       await sendRawCommand(_commandCodec.getConfig(), critical: true);
@@ -180,7 +172,7 @@ class AppState extends ChangeNotifier {
       _stopHeartbeat();
       connection = connection.copyWith(
         status: ControllerConnectionStatus.error,
-        message: 'Connection failed: $error',
+        message: _friendlyBleError(error),
       );
       _log('ERROR:$error');
     } finally {
@@ -627,5 +619,25 @@ class AppState extends ChangeNotifier {
       repeat: 5,
       seriesPauseMs: pauseMs,
     );
+  }
+
+  /// Maps the raw PlatformException messages from flutter_blue_plus to text a
+  /// person can act on. The plugin owns permission handling; we only translate
+  /// its errors, never pre-empt them.
+  String _friendlyBleError(Object error) {
+    final text = error.toString();
+    if (text.contains('Bluetooth must be turned on')) {
+      return 'Bluetooth выключен. Включите его и попробуйте снова.';
+    }
+    if (text.contains('BLUETOOTH_SCAN') || text.contains('BLUETOOTH_CONNECT')) {
+      return 'Нет разрешения Bluetooth. Откройте настройки приложения и включите его.';
+    }
+    if (text.contains('ACCESS_FINE_LOCATION') || text.contains('location')) {
+      return 'Для поиска BLE нужно разрешение геолокации. Включите его в настройках.';
+    }
+    if (text.contains('Location services')) {
+      return 'Включите служби геолокации в настройках телефона.';
+    }
+    return 'Ошибка Bluetooth: $text';
   }
 }

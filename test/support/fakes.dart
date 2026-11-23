@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:strobe_controller_mobile/models/connection_state_model.dart';
 import 'package:strobe_controller_mobile/models/controller_profile.dart';
-import 'package:strobe_controller_mobile/services/ble_permission_service.dart';
 import 'package:strobe_controller_mobile/services/controller_connection_service.dart';
 import 'package:strobe_controller_mobile/services/profile_exchange_service.dart';
 import 'package:strobe_controller_mobile/services/profile_storage_service.dart';
@@ -64,15 +63,6 @@ class FakeProfileStorageService extends ProfileStorageService {
   @override
   Future<void> saveProfiles(List<ControllerProfile> profiles) async {
     stored = List<ControllerProfile>.from(profiles);
-  }
-}
-
-class FakeBlePermissionService extends BlePermissionService {
-  bool requested = false;
-
-  @override
-  Future<void> ensurePermissions() async {
-    requested = true;
   }
 }
 

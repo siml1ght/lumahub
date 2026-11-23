@@ -12,19 +12,16 @@ void main() {
   group('AppState', () {
     late FakeConnectionService connection;
     late FakeProfileStorageService storage;
-    late FakeBlePermissionService permission;
     late FakeProfileExchangeService exchange;
     late AppState state;
 
     setUp(() {
       connection = FakeConnectionService();
       storage = FakeProfileStorageService();
-      permission = FakeBlePermissionService();
       exchange = FakeProfileExchangeService();
       state = AppState(
         connectionService: connection,
         profileStorageService: storage,
-        blePermissionService: permission,
         profileExchangeService: exchange,
         enableHeartbeat: false,
       );
@@ -44,7 +41,8 @@ void main() {
       await state.scanControllers();
       await state.connect('ESP32-StrobeCtrl (AA:BB)');
 
-      expect(permission.requested, isTrue);
+      // BLE permissions are requested by flutter_blue_plus during startScan(),
+      // not by the app, so the fake permission service is no longer called.
       expect(state.connection.status, ControllerConnectionStatus.connected);
       expect(connection.sentCommands, containsAll(['HELLO', 'GET_CONFIG']));
     });

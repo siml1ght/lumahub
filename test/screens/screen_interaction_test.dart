@@ -22,7 +22,6 @@ void main() {
       final state = AppState(
         connectionService: connection,
         profileStorageService: FakeProfileStorageService(),
-        blePermissionService: FakeBlePermissionService(),
         profileExchangeService: FakeProfileExchangeService(),
         enableHeartbeat: false,
       );
@@ -45,7 +44,6 @@ void main() {
       final state = AppState(
         connectionService: connection,
         profileStorageService: FakeProfileStorageService(),
-        blePermissionService: FakeBlePermissionService(),
         profileExchangeService: FakeProfileExchangeService(),
         enableHeartbeat: false,
       );
@@ -67,7 +65,6 @@ void main() {
       final state = AppState(
         connectionService: FakeConnectionService(),
         profileStorageService: FakeProfileStorageService(),
-        blePermissionService: FakeBlePermissionService(),
         profileExchangeService: FakeProfileExchangeService(),
         enableHeartbeat: false,
       );

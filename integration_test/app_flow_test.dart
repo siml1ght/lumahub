@@ -13,7 +13,6 @@ void main() {
     final appState = AppState(
       connectionService: FakeConnectionService(),
       profileStorageService: FakeProfileStorageService(),
-      blePermissionService: FakeBlePermissionService(),
       profileExchangeService: FakeProfileExchangeService(),
     )..bootstrap();
 
