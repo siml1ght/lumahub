@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../models/connection_state_model.dart';
@@ -48,6 +49,15 @@ class ConnectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(state.connection.message),
+              if (state.connection.status == ControllerConnectionStatus.error)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: OutlinedButton.icon(
+                    onPressed: openAppSettings,
+                    icon: const Icon(Icons.settings_outlined),
+                    label: const Text('Open app settings'),
+                  ),
+                ),
               const SizedBox(height: 16),
               Row(
                 children: [
