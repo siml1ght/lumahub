@@ -241,6 +241,8 @@ dist/LumaHub-release.apk
 
 ## 12. Команды, которые понимает прошивка
 
+Полный справочник протокола — в [PROTOCOL.md](PROTOCOL.md).
+
 Базовые:
 
 ```text

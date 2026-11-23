@@ -83,58 +83,11 @@ firmware/esp32_ble_controller/
 └── esp32_ble_controller.ino
 ```
 
-## BLE Interface
+## Protocol
 
-| Item | Value |
-|---|---|
-| Advertised device name | `LumaHub-ESP32` |
-| Service UUID | `5E7A1001-0000-4C0A-B001-112233445566` |
-| Command characteristic | `5E7A1002-0000-4C0A-B001-112233445566` |
-| Status characteristic | `5E7A1003-0000-4C0A-B001-112233445566` |
+The app and firmware exchange short text commands over a custom BLE GATT service named `LumaHub-ESP32`. Eight channels are addressed by name (`FrontLeft` … `Flood`) or by group (`FRONT`, `REAR`, `SIDE`, `ALL`).
 
-The command characteristic is written by the mobile client. The status characteristic is used for reads and notifications from the controller.
-
-### Protocol examples
-
-```text
-HELLO
-HEARTBEAT
-PING
-GET_CONFIG
-STATUS
-STOP
-ALL_OFF
-
-FrontLeft=ON
-RearRight=OFF
-
-MODE=ON;CH=FrontLeft,RearRight
-MODE=OFF;GROUP=REAR
-MODE=STROBE;CH=FrontLeft,RearRight;ON=80;OFF=80;REP=5;PAUSE=300
-MODE=ALTERNATE;CH=FrontLeft,FrontRight;ON=90;OFF=90;PAUSE=300
-MODE=SEQUENCE;ORDER=FrontLeft,RearLeft,Beacon;ON=50;OFF=70;PAUSE=120
-
-SET_GPIO;CH=FrontLeft;GPIO=16
-SET_INVERT;CH=Beacon;VALUE=0
-SET_FAILSAFE;MS=5000
-SAVE_CONFIG
-FACTORY_RESET
-```
-
-See [`firmware/esp32_ble_controller/README.md`](firmware/esp32_ble_controller/README.md) for the firmware command reference.
-
-## Default Firmware Configuration
-
-- Channels: `8`
-- GPIO pins: `16, 17, 18, 19, 21, 22, 23, 25`
-- Default polarity: active-high
-- Default fail-safe timeout: `5000 ms`
-- Allowed fail-safe range: `1000–60000 ms`
-- Default pulse timing: `80 ms ON / 80 ms OFF`
-- Default series pause: `300 ms`
-- Default repeat count: `5`
-
-GPIO assignments, polarity, and fail-safe timeout can be changed at runtime and persisted to NVS.
+The [BLE protocol reference](docs/PROTOCOL.md) defines the service, command grammar, channel list, control and configuration commands, status messages, and fail-safe behaviour. Firmware-specific build details live in [firmware/esp32_ble_controller/README.md](firmware/esp32_ble_controller/README.md).
 
 ## Getting Started
 
