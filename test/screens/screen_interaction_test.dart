@@ -33,7 +33,7 @@ void main() {
       await tester.pumpWidget(_hosted(const ManualControlScreen(), state));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Front Left'));
+      await tester.tap(find.text('Front left'));
       await tester.pumpAndSettle();
 
       expect(connection.sentCommands, contains('FrontLeft=ON'));
@@ -76,14 +76,11 @@ void main() {
       await tester.pumpWidget(_hosted(const SettingsScreen(), state));
       await tester.pumpAndSettle();
 
-      expect(state.themeMode, ThemeMode.dark);
-
-      await tester.tap(find.text('Dark Theme'));
-      await tester.pumpAndSettle();
-      expect(state.themeMode, ThemeMode.light);
+      // Appearance follows the system; no in-app appearance toggle.
+      expect(state.themeMode, ThemeMode.system);
 
       final before = state.useMockMode;
-      await tester.tap(find.text('Mock Mode'));
+      await tester.tap(find.text('Mock mode'));
       await tester.pumpAndSettle();
       expect(state.useMockMode, isNot(before));
     });

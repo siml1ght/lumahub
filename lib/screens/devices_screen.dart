@@ -29,20 +29,42 @@ class DevicesScreen extends StatelessWidget {
         icon: const Icon(Icons.add),
         label: const Text('Add Device'),
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: state.devices.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final device = state.devices[index];
-          return DeviceCard(
-            device: device,
-            onEdit: () => _openEditor(context, device),
-            onDelete: () => state.deleteDevice(device.id),
-            onToggle: () => state.toggleDevice(device.id),
-          );
-        },
-      ),
+      body: state.devices.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.lightbulb_outline, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No devices yet',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Add a device to map its channel and GPIO output.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.devices.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final device = state.devices[index];
+                return DeviceCard(
+                  device: device,
+                  onEdit: () => _openEditor(context, device),
+                  onDelete: () => state.deleteDevice(device.id),
+                  onToggle: () => state.toggleDevice(device.id),
+                );
+              },
+            ),
     );
   }
 

@@ -51,7 +51,7 @@ class AppState extends ChangeNotifier {
   Timer? _heartbeatTimer;
   DateTime _lastSentAt = DateTime.fromMillisecondsSinceEpoch(0);
 
-  ThemeMode themeMode = ThemeMode.dark;
+  ThemeMode themeMode = ThemeMode.system;
   bool useMockMode = true;
   bool isBusy = false;
   int currentIndex = 0;
@@ -108,9 +108,11 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Appearance follows the system setting. Kept as a no-op so existing
+  /// callers compile; the app-level appearance toggle was removed (HIG:
+  /// "Avoid offering an app-specific appearance setting").
   void toggleTheme(bool darkMode) {
-    themeMode = darkMode ? ThemeMode.dark : ThemeMode.light;
-    notifyListeners();
+    // Deliberately does nothing: themeMode stays ThemeMode.system.
   }
 
   void setMockMode(bool value) {

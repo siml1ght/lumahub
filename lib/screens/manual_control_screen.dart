@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/connection_state_model.dart';
@@ -10,42 +11,42 @@ class ManualControlScreen extends StatelessWidget {
   static const List<_ZoneControl> _controls = <_ZoneControl>[
     _ZoneControl(
       keyName: 'front_left',
-      label: 'Front Left',
+      label: 'Front left',
       icon: Icons.lightbulb_outline,
       channelName: 'FrontLeft',
       gpioLabel: 'GPIO16',
     ),
     _ZoneControl(
       keyName: 'front_right',
-      label: 'Front Right',
+      label: 'Front right',
       icon: Icons.lightbulb_outline,
       channelName: 'FrontRight',
       gpioLabel: 'GPIO17',
     ),
     _ZoneControl(
       keyName: 'rear_left',
-      label: 'Rear Left',
+      label: 'Rear left',
       icon: Icons.lightbulb_outline,
       channelName: 'RearLeft',
       gpioLabel: 'GPIO18',
     ),
     _ZoneControl(
       keyName: 'rear_right',
-      label: 'Rear Right',
+      label: 'Rear right',
       icon: Icons.lightbulb_outline,
       channelName: 'RearRight',
       gpioLabel: 'GPIO19',
     ),
     _ZoneControl(
       keyName: 'side_left',
-      label: 'Side Left',
+      label: 'Side left',
       icon: Icons.linear_scale,
       channelName: 'SideLeft',
       gpioLabel: 'GPIO21',
     ),
     _ZoneControl(
       keyName: 'side_right',
-      label: 'Side Right',
+      label: 'Side right',
       icon: Icons.linear_scale,
       channelName: 'SideRight',
       gpioLabel: 'GPIO22',
@@ -56,7 +57,6 @@ class ManualControlScreen extends StatelessWidget {
       icon: Icons.wb_incandescent_outlined,
       channelName: 'Beacon',
       gpioLabel: 'GPIO23',
-      accentColor: Color(0xFFFFB300),
     ),
     _ZoneControl(
       keyName: 'flood',
@@ -64,26 +64,25 @@ class ManualControlScreen extends StatelessWidget {
       icon: Icons.sunny,
       channelName: 'Flood',
       gpioLabel: 'GPIO25',
-      accentColor: Color(0xFF4FC3F7),
     ),
   ];
 
   static const List<_GroupControl> _groupControls = <_GroupControl>[
     _GroupControl(
       keyName: 'group_front',
-      label: 'Front Group',
+      label: 'Front group',
       groupName: 'FRONT',
       icon: Icons.flip_to_front,
     ),
     _GroupControl(
       keyName: 'group_rear',
-      label: 'Rear Group',
+      label: 'Rear group',
       groupName: 'REAR',
       icon: Icons.flip_to_back,
     ),
     _GroupControl(
       keyName: 'group_side',
-      label: 'Side Group',
+      label: 'Side group',
       groupName: 'SIDE',
       icon: Icons.view_sidebar_outlined,
     ),
@@ -96,13 +95,7 @@ class ManualControlScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Live Control'),
-        actions: [
-          IconButton(
-            onPressed: () => state.triggerControl('all_off', 'ALL_OFF'),
-            icon: const Icon(Icons.power_settings_new),
-          ),
-        ],
+        title: const Text('Live control'),
       ),
       body: Column(
         children: [
@@ -162,10 +155,9 @@ class ManualControlScreen extends StatelessWidget {
                     final command = '${control.channelName}=${active ? 'OFF' : 'ON'}';
                     return _ZoneTile(
                       label: control.label,
-                      subtitle: '${control.channelName} -> ${control.gpioLabel}',
+                      subtitle: '${control.channelName} · ${control.gpioLabel}',
                       icon: control.icon,
                       active: active,
-                      accentColor: control.accentColor,
                       onTap: () => state.triggerControl(control.keyName, command),
                     );
                   },
@@ -196,17 +188,14 @@ class ManualControlScreen extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: state.connection.status ==
                           ControllerConnectionStatus.connected
-                      ? () => state.sendRawCommand(
-                            'MODE=SEQUENCE;ORDER=FrontLeft,FrontRight,RearLeft,RearRight,SideLeft,SideRight,Beacon,Flood;ON=3000;OFF=500;PAUSE=1000',
-                            critical: true,
-                          )
+                      ? () => _confirmPinScan(context, state)
                       : null,
                   icon: const Icon(Icons.troubleshoot),
-                  label: const Text('Pin Scan: 3s each GPIO'),
+                  label: const Text('Pin scan'),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Pin Scan turns on GPIO16, 17, 18, 19, 21, 22, 23, 25 one by one. Use DC V 20 on the multimeter.',
+                  'Energizes GPIO16, 17, 18, 19, 21, 22, 23 and 25 one by one. Set your multimeter to DC V 20.',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -217,8 +206,42 @@ class ManualControlScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => state.triggerControl('all_off', 'ALL_OFF'),
         icon: const Icon(Icons.power_settings_new),
-        label: const Text('All Off'),
+        label: const Text('All off'),
       ),
+    );
+  }
+
+  Future<void> _confirmPinScan(
+    BuildContext context,
+    AppState state,
+  ) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Start pin scan?'),
+            content: const Text(
+              'Energizes each output for 3 seconds, from GPIO16 through GPIO25. '
+              'Disconnect any loads before continuing.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('Start scan'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed || !context.mounted) {
+      return;
+    }
+    await state.sendRawCommand(
+      'MODE=SEQUENCE;ORDER=FrontLeft,FrontRight,RearLeft,RearRight,SideLeft,SideRight,Beacon,Flood;ON=3000;OFF=500;PAUSE=1000',
+      critical: true,
     );
   }
 }
@@ -230,7 +253,6 @@ class _ZoneTile extends StatelessWidget {
     required this.icon,
     required this.active,
     required this.onTap,
-    this.accentColor,
   });
 
   final String label;
@@ -238,21 +260,23 @@ class _ZoneTile extends StatelessWidget {
   final IconData icon;
   final bool active;
   final VoidCallback onTap;
-  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final accent = accentColor ?? colorScheme.primary;
+    final accent = colorScheme.primary;
 
     return Material(
       color: active
           ? accent.withValues(alpha: 0.25)
           : colorScheme.surfaceContainerHighest.withValues(alpha: 0.22),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
@@ -264,24 +288,33 @@ class _ZoneTile extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: active ? Colors.white : null,
-                      ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
                 ),
               ),
               Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: active
-                          ? Colors.white70
-                          : colorScheme.onSurfaceVariant,
+                active ? 'On' : 'Off',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: active ? accent : colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
                     ),
               ),
             ],
@@ -328,7 +361,6 @@ class _ZoneControl {
     required this.icon,
     required this.channelName,
     required this.gpioLabel,
-    this.accentColor,
   });
 
   final String keyName;
@@ -336,7 +368,6 @@ class _ZoneControl {
   final IconData icon;
   final String channelName;
   final String gpioLabel;
-  final Color? accentColor;
 }
 
 class _GroupControl {

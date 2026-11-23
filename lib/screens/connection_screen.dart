@@ -24,7 +24,7 @@ class ConnectionScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'LumaHub Connection',
+          'LumaHub connection',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 16),
@@ -54,7 +54,24 @@ class ConnectionScreen extends StatelessWidget {
                   Expanded(
                     child: FilledButton(
                       onPressed: state.isBusy ? null : state.scanControllers,
-                      child: const Text('Scan Controllers'),
+                      child: state.isBusy
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Scanning'),
+                              ],
+                            )
+                          : const Text('Scan controllers'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -72,10 +89,13 @@ class ConnectionScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text('Signal: ${state.connection.signalStrength}%'),
               const SizedBox(height: 4),
-              LinearProgressIndicator(
-                value: state.connection.signalStrength / 100,
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(999),
+              Semantics(
+                label: 'Signal strength ${state.connection.signalStrength}%',
+                child: LinearProgressIndicator(
+                  value: state.connection.signalStrength / 100,
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(999),
+                ),
               ),
             ],
           ),

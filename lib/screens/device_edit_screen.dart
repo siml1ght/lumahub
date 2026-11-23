@@ -59,6 +59,12 @@ class _DeviceEditScreenState extends State<DeviceEditScreen> {
     super.dispose();
   }
 
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.read<AppState>();
@@ -159,24 +165,44 @@ class _DeviceEditScreenState extends State<DeviceEditScreen> {
           const SizedBox(height: 12),
           FilledButton(
             onPressed: () {
+              final channel = int.tryParse(_channelController.text);
+              final channelCount = int.tryParse(_channelCountController.text);
+              final primaryOutput = int.tryParse(_primaryOutputController.text);
+
+              if (_nameController.text.trim().isEmpty) {
+                _showError(context, 'Device name is required');
+                return;
+              }
+              if (channel == null || channel < 1) {
+                _showError(context, 'Channel must be a number greater than 0');
+                return;
+              }
+              if (channelCount == null || channelCount < 1) {
+                _showError(context, 'Channel count must be at least 1');
+                return;
+              }
+              if (primaryOutput == null || primaryOutput < 1) {
+                _showError(context, 'Primary output must be at least 1');
+                return;
+              }
+
               final updated = widget.device.copyWith(
                 name: _nameController.text.trim(),
                 type: _type,
-                channel: int.tryParse(_channelController.text) ?? 1,
+                channel: channel,
                 group: _groupController.text.trim(),
                 enabled: _enabled,
                 inverted: _inverted,
                 brightness: _brightness.round(),
                 mode: _modeController.text.trim(),
-                channelCount: int.tryParse(_channelCountController.text) ?? 1,
-                primaryOutput:
-                    int.tryParse(_primaryOutputController.text) ?? 1,
+                channelCount: channelCount,
+                primaryOutput: primaryOutput,
               );
 
               state.upsertDevice(updated);
               Navigator.of(context).pop();
             },
-            child: const Text('Save Device'),
+            child: const Text('Save device'),
           ),
         ],
       ),

@@ -43,6 +43,7 @@ class PatternsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   _PatternSlider(
                     label: 'Speed',
+                    semanticLabel: 'Pattern speed',
                     value: pattern.speed,
                     min: 0.2,
                     max: 2.0,
@@ -53,6 +54,7 @@ class PatternsScreen extends StatelessWidget {
                   ),
                   _PatternSlider(
                     label: 'Pause ${pattern.pauseMs} ms',
+                    semanticLabel: 'Pause between flashes',
                     value: pattern.pauseMs.toDouble(),
                     min: 20,
                     max: 500,
@@ -101,6 +103,7 @@ class PatternsScreen extends StatelessWidget {
 class _PatternSlider extends StatelessWidget {
   const _PatternSlider({
     required this.label,
+    required this.semanticLabel,
     required this.value,
     required this.min,
     required this.max,
@@ -109,6 +112,7 @@ class _PatternSlider extends StatelessWidget {
   });
 
   final String label;
+  final String semanticLabel;
   final double value;
   final double min;
   final double max;
@@ -121,13 +125,16 @@ class _PatternSlider extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
-        Slider(
-          value: value.clamp(min, max),
+        Semantics(
+          label: semanticLabel,
+          child: Slider(
+            value: value.clamp(min, max),
           min: min,
           max: max,
           divisions: divisions,
           label: value.round().toString(),
-          onChanged: onChanged,
+            onChanged: onChanged,
+          ),
         ),
       ],
     );

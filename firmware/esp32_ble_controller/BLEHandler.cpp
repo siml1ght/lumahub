@@ -60,5 +60,8 @@ void BLEHandler::CommandCallbacks::onWrite(BLECharacteristic* characteristic) {
     _owner.updateStatus("ERROR:COMMAND_TOO_LONG");
     return;
   }
-  _owner._listener.onBleCommand(String(raw.c_str()));
+  // Build from the buffer with its explicit length: String(raw.c_str()) would
+  // truncate at an embedded NUL and let a malformed packet change the command.
+  _owner._listener.onBleCommand(
+      String(reinterpret_cast<const char*>(raw.data()), raw.length()));
 }

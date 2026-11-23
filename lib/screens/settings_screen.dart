@@ -11,7 +11,6 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
-    final isDark = state.themeMode == ThemeMode.dark;
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -20,38 +19,21 @@ class SettingsScreen extends StatelessWidget {
           'Settings',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         SectionCard(
           child: Column(
             children: [
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                value: isDark,
-                onChanged: state.toggleTheme,
-                title: const Text('Dark Theme'),
-                subtitle: const Text('Optimized for low-light usage'),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
                 value: state.useMockMode,
                 onChanged: state.setMockMode,
-                title: const Text('Mock Mode'),
+                title: const Text('Mock mode'),
                 subtitle: const Text('Use simulated controller responses'),
-              ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Transport'),
-                subtitle: Text(state.useMockMode ? 'Mock transport' : 'BLE transport'),
-                trailing: Icon(
-                  state.useMockMode
-                      ? Icons.developer_mode_outlined
-                      : Icons.bluetooth_connected,
-                ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         SectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
                 'Diagnostics',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(state.lastLog),
               const SizedBox(height: 12),
               FilledButton.tonal(
@@ -71,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Open Diagnostics'),
+                child: const Text('Open diagnostics'),
               ),
             ],
           ),

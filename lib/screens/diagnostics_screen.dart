@@ -50,6 +50,7 @@ class DiagnosticsScreen extends StatelessWidget {
         title: const Text('Diagnostics'),
         actions: [
           IconButton(
+            tooltip: 'Clear logs',
             onPressed: state.clearLogs,
             icon: const Icon(Icons.delete_sweep_outlined),
           ),
@@ -63,14 +64,10 @@ class DiagnosticsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Connection Snapshot',
+                  'Inventory',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
-                Text('Status: ${state.connection.status.name}'),
-                Text('Controller: ${state.connection.controllerName}'),
-                Text('Signal: ${state.connection.signalStrength}%'),
-                Text('Mock mode: ${state.useMockMode ? 'on' : 'off'}'),
                 Text('Devices: ${state.devices.length}'),
                 Text('Profiles: ${state.profiles.length}'),
               ],

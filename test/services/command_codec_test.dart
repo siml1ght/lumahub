@@ -42,23 +42,36 @@ void main() {
       );
     });
 
-    test('parses incoming message into command and payload', () {
-      expect(
-        codec.parseIncoming('STATUS:CONNECTED'),
-        {'command': 'STATUS', 'payload': 'CONNECTED'},
-      );
-      expect(
-        codec.parseIncoming('PING'),
-        {'command': 'PING', 'payload': ''},
-      );
+    test('encodes firmware control commands', () {
+      expect(codec.saveProfile(), 'SAVE_CONFIG');
+      expect(codec.loadProfile('night-run'), 'GET_CONFIG');
+      expect(codec.factoryReset(), 'FACTORY_RESET');
+      expect(codec.setGpio('FrontLeft', 16), 'SET_GPIO;CH=FrontLeft;GPIO=16');
+      expect(codec.setInvert('Beacon', true), 'SET_INVERT;CH=Beacon;VALUE=1');
+      expect(codec.setInvert('Beacon', false), 'SET_INVERT;CH=Beacon;VALUE=0');
+      expect(codec.setFailSafe(5000), 'SET_FAILSAFE;MS=5000');
+      expect(codec.stop(), 'STOP');
     });
 
-    test('empty placeholders are explicit for unsupported firmware commands', () {
-      expect(codec.saveProfile(), isEmpty);
-      expect(codec.loadProfile('night-run'), isEmpty);
-      expect(codec.speed(8), isEmpty);
-      expect(codec.toggle('FrontLeft'), isEmpty);
-      expect(codec.deleteDevice('id-1'), isEmpty);
+    test('pattern ids map to known firmware patterns', () {
+      expect(codec.pattern('strobe'), contains('MODE=STROBE'));
+      expect(codec.pattern('alternate'), contains('MODE=ALTERNATE'));
+      expect(codec.pattern('sequence'), contains('MODE=SEQUENCE'));
+      expect(codec.pattern('unknown'), contains('MODE=STROBE'));
+      expect(codec.pattern('STROBE'), contains('MODE=STROBE'));
+    });
+
+    test('parses key/value pairs using the firmware delimiter', () {
+      expect(
+        codec.parseIncoming('MODE=ON;CH=FrontLeft,RearRight'),
+        {'MODE': 'ON', 'CH': 'FrontLeft,RearRight'},
+      );
+      expect(codec.parseIncoming('STATUS'), {'command': 'STATUS'});
+      expect(codec.parseIncoming('SET_GPIO;CH=FrontLeft;GPIO=16'), {
+        'CH': 'FrontLeft',
+        'GPIO': '16',
+      });
+      expect(codec.parseIncoming(''), isEmpty);
     });
   });
 }

@@ -1,4 +1,4 @@
-# Strobe Controller Mobile Project Rules
+# LumaHub Project Rules
 
 ## Product Goal
 - Build a Flutter MVP for configuring and controlling an Arduino or ESP32 strobe-light controller.

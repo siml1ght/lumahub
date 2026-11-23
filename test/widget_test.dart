@@ -15,7 +15,7 @@ void main() {
 
     await tester.pump();
 
-    expect(find.text('LumaHub Connection'), findsOneWidget);
+    expect(find.text('LumaHub connection'), findsOneWidget);
     expect(find.text('Connect'), findsOneWidget);
   });
 }

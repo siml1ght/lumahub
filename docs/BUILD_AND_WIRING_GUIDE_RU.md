@@ -174,7 +174,7 @@ firmware/esp32_ble_controller/esp32_ble_controller.ino
 1. Установи APK:
 
 ```text
-dist/StagePatch-release.apk
+dist/LumaHub-release.apk
 ```
 
 2. Включи Bluetooth.
