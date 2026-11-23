@@ -37,8 +37,8 @@ class SettingsScreen extends StatelessWidget {
         const SectionCard(
           child: ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('LumaHub 0.2.0+3'),
-            subtitle: Text('Build 3'),
+            title: Text('LumaHub 0.2.0+4'),
+            subtitle: Text('Build 4'),
           ),
         ),
         const SizedBox(height: 24),

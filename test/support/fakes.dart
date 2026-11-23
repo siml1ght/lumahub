@@ -12,12 +12,18 @@ class FakeConnectionService implements ControllerConnectionService {
   List<String> scanResults = const ['ESP32-StrobeCtrl (AA:BB:CC:DD:EE:FF)'];
   final List<String> sentCommands = <String>[];
   bool connected = false;
+  Object? scanError;
 
   @override
   Stream<String> get incomingMessages => _messages.stream;
 
   @override
-  Future<List<String>> scan() async => scanResults;
+  Future<List<String>> scan() async {
+    if (scanError != null) {
+      throw scanError!;
+    }
+    return scanResults;
+  }
 
   @override
   Future<ConnectionStateModel> connect(String controllerId) async {

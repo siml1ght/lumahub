@@ -626,18 +626,23 @@ class AppState extends ChangeNotifier {
   /// its errors, never pre-empt them.
   String _friendlyBleError(Object error) {
     final text = error.toString();
+
+    // Our own timeout while waiting for the adapter to come on.
+    if (error is TimeoutException ||
+        text.contains('Bluetooth adapter is off or unavailable')) {
+      return 'Включите Bluetooth на телефоне и попробуйте снова.';
+    }
     if (text.contains('Bluetooth must be turned on')) {
-      return 'Bluetooth выключен. Включите его и попробуйте снова.';
+      return 'Включите Bluetooth на телефоне и попробуйте снова.';
     }
     if (text.contains('BLUETOOTH_SCAN') || text.contains('BLUETOOTH_CONNECT')) {
       return 'Нет разрешения Bluetooth. Откройте настройки приложения и включите его.';
     }
-    if (text.contains('ACCESS_FINE_LOCATION') || text.contains('location')) {
-      return 'Для поиска BLE нужно разрешение геолокации. Включите его в настройках.';
+    if (text.contains('ACCESS_FINE_LOCATION') ||
+        text.contains('location') ||
+        text.contains('Location services')) {
+      return 'Для поиска BLE нужна геолокация. Включите её в настройках телефона.';
     }
-    if (text.contains('Location services')) {
-      return 'Включите служби геолокации в настройках телефона.';
-    }
-    return 'Ошибка Bluetooth: $text';
+    return 'Не удалось подключиться по Bluetooth. Попробуйте снова.';
   }
 }

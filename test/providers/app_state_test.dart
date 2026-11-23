@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:strobe_controller_mobile/models/connection_state_model.dart';
 import 'package:strobe_controller_mobile/models/controller_profile.dart';
@@ -45,6 +47,23 @@ void main() {
       // not by the app, so the fake permission service is no longer called.
       expect(state.connection.status, ControllerConnectionStatus.connected);
       expect(connection.sentCommands, containsAll(['HELLO', 'GET_CONFIG']));
+    });
+
+    test('Bluetooth adapter timeout becomes an actionable message', () async {
+      await state.bootstrap();
+      connection.scanError = TimeoutException(
+        'Bluetooth adapter is off or unavailable',
+        const Duration(seconds: 8),
+      );
+
+      await state.scanControllers();
+
+      expect(state.connection.status, ControllerConnectionStatus.error);
+      expect(
+        state.connection.message,
+        'Включите Bluetooth на телефоне и попробуйте снова.',
+      );
+      expect(state.connection.message, isNot(contains('TimeoutException')));
     });
 
     test('incoming disconnect resets connection and active controls', () async {
