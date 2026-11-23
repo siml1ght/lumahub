@@ -1,21 +1,14 @@
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class BlePermissionService {
-  static const _platform = MethodChannel('dev.siml1ght.lumahub/android_info');
-
-  /// Returns Android SDK level, or null on non-Android / channel errors.
-  Future<int?> get _androidSdkInt async {
-    if (!Platform.isAndroid) return null;
-    try {
-      return await _platform.invokeMethod<int>('getSdkInt');
-    } on PlatformException {
-      return null;
-    }
-  }
-
+  /// Requests the Bluetooth permissions the app controls itself.
+  ///
+  /// Location is intentionally NOT requested here. The manifest declares
+  /// ACCESS_FINE_LOCATION with maxSdkVersion=30, so on Android 12+ the system
+  /// cannot grant it. flutter_blue_plus requests ACCESS_FINE_LOCATION itself
+  /// during startScan() on Android 11 and below, where it is genuinely needed.
   Future<void> ensurePermissions() async {
     if (!Platform.isAndroid && !Platform.isIOS) {
       return;
@@ -26,15 +19,6 @@ class BlePermissionService {
       Permission.bluetoothConnect,
     ];
 
-    // ACCESS_FINE_LOCATION is declared with maxSdkVersion=30 in the manifest,
-    // so only Android 11 and below actually need it for BLE scanning.
-    final sdkInt = await _androidSdkInt;
-    final needsLocation = Platform.isAndroid && (sdkInt == null || sdkInt <= 30);
-
-    if (needsLocation) {
-      permissions.add(Permission.locationWhenInUse);
-    }
-
     final statuses = await permissions.request();
 
     final permanentlyDenied = statuses.entries
@@ -44,7 +28,8 @@ class BlePermissionService {
     if (permanentlyDenied.isNotEmpty) {
       final names = permanentlyDenied.map(_name).join(', ');
       throw StateError(
-        'Разрешение не выдано навсегда: $names. Откройте настройки приложения и включите его.',
+        'Разрешение не выдано навсегда: $names. '
+        'Откройте настройки приложения и включите его.',
       );
     }
 
@@ -64,8 +49,6 @@ class BlePermissionService {
         return 'сканирование Bluetooth';
       case Permission.bluetoothConnect:
         return 'подключение Bluetooth';
-      case Permission.locationWhenInUse:
-        return 'геолокация (нужна на Android 11 и ниже для поиска BLE)';
       default:
         return permission.toString();
     }
